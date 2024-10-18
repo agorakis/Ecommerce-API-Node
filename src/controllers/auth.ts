@@ -1,20 +1,15 @@
-import { NextFunction, Request, Response } from "express";
+import { Request, Response } from "express";
 import { prismaClient } from "..";
 import { hashSync, compareSync } from "bcrypt";
 import * as jwt from "jsonwebtoken";
 import { JWT_SECRET } from "../secrets";
 import { BadRequestsException } from "../exceptions/bad-requests";
 import { ErrorCode } from "../exceptions/root";
-import { UnprocessableEntity } from "../exceptions/validation";
-import { SingUpSchema } from "../schema/users";
+import { LoginSchema, SingUpSchema } from "../schema/users";
 import { NotFoundException } from "../exceptions/not-found";
 
-export const signup = async (
-  req: Request,
-  res: Response,
-  next: NextFunction
-) => {
-  SingUpSchema.parse(req.body);
+export const signup = async (req: Request, res: Response) => {
+  SingUpSchema.shape.body.parse(req.body);
   const { email, password, name } = req.body;
 
   let user = await prismaClient.user.findFirst({ where: { email: email } });
@@ -33,6 +28,8 @@ export const signup = async (
 };
 
 export const login = async (req: Request, res: Response) => {
+  LoginSchema.shape.body.parse(req.body);
+
   const { email, password } = req.body;
 
   let user = await prismaClient.user.findFirst({ where: { email: email } });
