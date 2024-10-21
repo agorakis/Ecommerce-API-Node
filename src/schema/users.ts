@@ -39,3 +39,18 @@ export const AuthHeadersSchema = z.object({
     .min(1, "Authorization header is required")
     .describe("Token for authorization"),
 });
+
+export const AddressSchema = z.object({
+  lineOne: z.string(),
+  lineTwo: z.string().nullable(),
+  pincode: z.string().length(5),
+  country: z.string(),
+  city: z.string(),
+  userId: z.number(),
+});
+
+export const GetAddressesSchema = z.array(AddressSchema);
+
+export const AddressByIdSchema = z.object({
+  params: z.object({ id: z.number() }),
+});
