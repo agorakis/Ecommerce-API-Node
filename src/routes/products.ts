@@ -174,7 +174,7 @@ productRegistry.registerPath({
     },
   },
   responses: {
-    201: {
+    200: {
       description: "Product updated successfully",
       content: {
         "application/json": {

@@ -27,6 +27,9 @@ model User {
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
+  defaultShippingAddress Int?
+  defaultBillingAddress Int?
+
   addresses Address[]
   @@map("users")
 }

@@ -2,7 +2,8 @@ import { Request, Response } from "express";
 import { prismaClient } from "..";
 import { NotFoundException } from "../exceptions/not-found";
 import { ErrorCode } from "../exceptions/root";
-import { AddressSchema } from "../schema/users";
+import { AddressSchema, UpdateUserSchema } from "../schema/users";
+import { Address } from "@prisma/client";
 
 export const getUserAddresses = async (req: Request, res: Response) => {
   const userAddresses = await prismaClient.address.findMany({
@@ -43,4 +44,57 @@ export const createAddress = async (req: Request, res: Response) => {
   });
 
   res.send(address);
+};
+
+export const updateUser = async (req: Request, res: Response) => {
+  const validatedData = UpdateUserSchema.parse(req.body);
+
+  let shippingAddress: Address;
+  let billingAddress: Address;
+
+  if (validatedData.defaultShippingAddress) {
+    try {
+      shippingAddress = await prismaClient.address.findFirstOrThrow({
+        where: { id: validatedData.defaultShippingAddress },
+      });
+    } catch (error) {
+      throw new NotFoundException(
+        "Address not found!",
+        ErrorCode.ADDRESS_NOT_FOUND
+      );
+    }
+
+    if (shippingAddress.userId !== req.body.user.id) {
+      throw new NotFoundException(
+        "Address does not belong to user",
+        ErrorCode.ADDRESS_DOES_NOT_BELONG
+      );
+    }
+  }
+
+  if (validatedData.defaultBillingAddress) {
+    try {
+      billingAddress = await prismaClient.address.findFirstOrThrow({
+        where: { id: validatedData.defaultBillingAddress },
+      });
+    } catch (error) {
+      throw new NotFoundException(
+        "Address not found!",
+        ErrorCode.ADDRESS_NOT_FOUND
+      );
+    }
+    if (billingAddress.userId !== req.body.user.id) {
+      throw new NotFoundException(
+        "Address does not belong to user",
+        ErrorCode.ADDRESS_DOES_NOT_BELONG
+      );
+    }
+  }
+
+  const updatedUser = await prismaClient.user.update({
+    where: { id: req.body.user.id },
+    data: validatedData,
+  });
+
+  res.send(updatedUser);
 };

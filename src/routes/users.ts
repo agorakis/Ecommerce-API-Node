@@ -7,12 +7,14 @@ import {
   AddressSchema,
   AuthHeadersSchema,
   GetAddressesSchema,
+  UpdateUserSchema,
   UserSchema,
 } from "../schema/users";
 import {
   createAddress,
   deleteAddress,
   getUserAddresses,
+  updateUser,
 } from "../controllers/users";
 
 export const userRegistry = new OpenAPIRegistry();
@@ -113,5 +115,42 @@ userRegistry.registerPath({
 });
 
 usersRouter.post("/address", [authMiddleware], errorHandler(createAddress));
+
+//Add documentation registration
+
+userRegistry.registerPath({
+  method: "put",
+  path: "/users",
+  tags: ["Users"],
+  description:
+    "This endpoint updates user's name and shipping & billing addresses",
+  summary: "Updates user",
+  request: {
+    headers: AuthHeadersSchema,
+    body: {
+      content: {
+        "application/json": { schema: UpdateUserSchema },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: "User updated successfully",
+      content: {
+        "application/json": {
+          schema: UserSchema,
+        },
+      },
+    },
+    401: {
+      description: "Unauthorized, invalid or missing token",
+    },
+    404: {
+      description: "Address not found",
+    },
+  },
+});
+
+usersRouter.put("/", [authMiddleware], errorHandler(updateUser));
 
 export default usersRouter;

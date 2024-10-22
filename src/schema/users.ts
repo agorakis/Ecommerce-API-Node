@@ -10,6 +10,15 @@ export const UserSchema = z.object({
   password: z.string(),
   createdAt: z.string(),
   updatedAt: z.string(),
+
+  defaultShippingAddress: z.number().optional(),
+  defaultBillingAddress: z.number().optional(),
+});
+
+export const UpdateUserSchema = z.object({
+  name: z.string().optional(),
+  defaultShippingAddress: z.number().optional(),
+  defaultBillingAddress: z.number().optional(),
 });
 
 export const AuthSchema = z.object({
