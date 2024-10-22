@@ -116,8 +116,6 @@ userRegistry.registerPath({
 
 usersRouter.post("/address", [authMiddleware], errorHandler(createAddress));
 
-//Add documentation registration
-
 userRegistry.registerPath({
   method: "put",
   path: "/users",

@@ -5,12 +5,14 @@ import {
 import { authRegistry } from "../routes/auth";
 import { productRegistry } from "../routes/products";
 import { userRegistry } from "../routes/users";
+import { cartRegistry } from "../routes/cart";
 
 export const generateOpenAPIDocument = () => {
   const registry = new OpenAPIRegistry([
     authRegistry,
     productRegistry,
     userRegistry,
+    cartRegistry,
   ]);
 
   const generator = new OpenApiGeneratorV3(registry.definitions);
