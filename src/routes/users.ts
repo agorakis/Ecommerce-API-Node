@@ -61,7 +61,7 @@ userRegistry.registerPath({
     params: AddressByIdSchema.shape.params,
   },
   responses: {
-    201: {
+    200: {
       description: "Address deleted successfully",
       content: {
         "application/json": {

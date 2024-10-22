@@ -16,3 +16,7 @@ export const AddCartSchema = z.object({
   productId: z.number(),
   quantity: z.number(),
 });
+
+export const CartByIdSchema = z.object({
+  params: z.object({ id: z.number() }),
+});

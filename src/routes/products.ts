@@ -99,7 +99,7 @@ productRegistry.registerPath({
     params: ProductByIdSchema.shape.params,
   },
   responses: {
-    201: {
+    200: {
       description: "Product deleted successfully",
       content: {
         "application/json": {

@@ -2,9 +2,9 @@ import { Router } from "express";
 import { errorHandler } from "../error-handler";
 import { OpenAPIRegistry } from "@asteasolutions/zod-to-openapi";
 import { authMiddleware } from "../middlewares/auth";
-import { addItemToCart } from "../controllers/cart";
+import { addItemToCart, deleteCartItem } from "../controllers/cart";
 import { AuthHeadersSchema } from "../schema/users";
-import { AddCartSchema, CartItemSchema } from "../schema/cart";
+import { AddCartSchema, CartByIdSchema, CartItemSchema } from "../schema/cart";
 
 export const cartRegistry = new OpenAPIRegistry();
 cartRegistry.register("Cart", CartItemSchema);
@@ -37,40 +37,36 @@ const cartRouter: Router = Router();
 
 // usersRouter.get("/address", [authMiddleware], errorHandler(getUserAddresses));
 
-// userRegistry.registerPath({
-//   method: "delete",
-//   path: "/users/address/{id}",
-//   tags: ["Users"],
-//   description:
-//     "This endpoint delete specific address by id of the logged in user",
-//   summary: "Delete address by id",
-//   request: {
-//     headers: AuthHeadersSchema,
-//     params: AddressByIdSchema.shape.params,
-//   },
-//   responses: {
-//     201: {
-//       description: "Address deleted successfully",
-//       content: {
-//         "application/json": {
-//           schema: AddressSchema,
-//         },
-//       },
-//     },
-//     401: {
-//       description: "Unauthorized, invalid or missing token",
-//     },
-//     404: {
-//       description: "Product not found",
-//     },
-//   },
-// });
+cartRegistry.registerPath({
+  method: "delete",
+  path: "/cart/{id}",
+  tags: ["Cart"],
+  description:
+    "This endpoint delete specific product by id of the logged in user cart",
+  summary: "Delete procuct from cart by id",
+  request: {
+    headers: AuthHeadersSchema,
+    params: CartByIdSchema.shape.params,
+  },
+  responses: {
+    200: {
+      description: "Product deleted successfully",
+      content: {
+        "application/json": {
+          schema: CartItemSchema,
+        },
+      },
+    },
+    401: {
+      description: "Unauthorized, invalid or missing token",
+    },
+    404: {
+      description: "Product not found",
+    },
+  },
+});
 
-// usersRouter.delete(
-//   "/address/:id",
-//   [authMiddleware],
-//   errorHandler(deleteAddress)
-// );
+cartRouter.delete("/:id", [authMiddleware], errorHandler(deleteCartItem));
 
 cartRegistry.registerPath({
   method: "post",
@@ -78,7 +74,7 @@ cartRegistry.registerPath({
   tags: ["Cart"],
   description:
     "This endpoint allows a logged in user to add products in the cart",
-  summary: "Add products to cart",
+  summary: "Add product to cart",
   request: {
     headers: AuthHeadersSchema,
     body: {
