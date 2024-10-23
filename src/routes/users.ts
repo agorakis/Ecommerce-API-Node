@@ -33,7 +33,7 @@ userRegistry.registerPath({
     headers: AuthHeadersSchema,
   },
   responses: {
-    201: {
+    200: {
       description: "Addresses retrieved successfully",
       content: {
         "application/json": {

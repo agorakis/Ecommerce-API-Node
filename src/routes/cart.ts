@@ -4,6 +4,7 @@ import { OpenAPIRegistry } from "@asteasolutions/zod-to-openapi";
 import { authMiddleware } from "../middlewares/auth";
 import {
   addItemToCart,
+  changeQuantity,
   deleteCartItem,
   getUserCart,
 } from "../controllers/cart";
@@ -12,6 +13,7 @@ import {
   AddCartSchema,
   CartByIdSchema,
   CartItemSchema,
+  ChangeQuantitySchema,
   GetCartSchema,
 } from "../schema/cart";
 
@@ -113,39 +115,36 @@ cartRegistry.registerPath({
 
 cartRouter.post("/", [authMiddleware], errorHandler(addItemToCart));
 
-// userRegistry.registerPath({
-//   method: "put",
-//   path: "/users",
-//   tags: ["Users"],
-//   description:
-//     "This endpoint updates user's name and shipping & billing addresses",
-//   summary: "Updates user",
-//   request: {
-//     headers: AuthHeadersSchema,
-//     body: {
-//       content: {
-//         "application/json": { schema: UpdateUserSchema },
-//       },
-//     },
-//   },
-//   responses: {
-//     200: {
-//       description: "User updated successfully",
-//       content: {
-//         "application/json": {
-//           schema: UserSchema,
-//         },
-//       },
-//     },
-//     401: {
-//       description: "Unauthorized, invalid or missing token",
-//     },
-//     404: {
-//       description: "Address not found",
-//     },
-//   },
-// });
+cartRegistry.registerPath({
+  method: "put",
+  path: "/cart/{id}",
+  tags: ["Cart"],
+  description: "This endpoint updates the quantity of a cart item",
+  summary: "Updates quantity of a cart item",
+  request: {
+    headers: AuthHeadersSchema,
+    params: ChangeQuantitySchema.shape.params,
+    body: {
+      content: {
+        "application/json": { schema: ChangeQuantitySchema.shape.body },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: "Quantity updated successfully",
+      content: {
+        "application/json": {
+          schema: CartItemSchema,
+        },
+      },
+    },
+    401: {
+      description: "Unauthorized, invalid or missing token",
+    },
+  },
+});
 
-// usersRouter.put("/", [authMiddleware], errorHandler(updateUser));
+cartRouter.put("/:id", [authMiddleware], errorHandler(changeQuantity));
 
 export default cartRouter;

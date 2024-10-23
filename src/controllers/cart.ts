@@ -2,7 +2,7 @@ import { Request, Response } from "express";
 import { prismaClient } from "..";
 import { NotFoundException } from "../exceptions/not-found";
 import { ErrorCode } from "../exceptions/root";
-import { AddCartSchema } from "../schema/cart";
+import { AddCartSchema, ChangeQuantitySchema } from "../schema/cart";
 import { Product } from "@prisma/client";
 
 export const getUserCart = async (req: Request, res: Response) => {
@@ -54,7 +54,7 @@ export const addItemToCart = async (req: Request, res: Response) => {
         // userId: req.body.user.id,
       },
       data: {
-        ...productAlredyExistInCart,
+        // ...productAlredyExistInCart,
         quantity: productAlredyExistInCart.quantity + validateData.quantity,
       },
     });
@@ -86,55 +86,11 @@ export const addItemToCart = async (req: Request, res: Response) => {
   }
 };
 
-// export const updateUser = async (req: Request, res: Response) => {
-//   const validatedData = UpdateUserSchema.parse(req.body);
-
-//   let shippingAddress: Address;
-//   let billingAddress: Address;
-
-//   if (validatedData.defaultShippingAddress) {
-//     try {
-//       shippingAddress = await prismaClient.address.findFirstOrThrow({
-//         where: { id: validatedData.defaultShippingAddress },
-//       });
-//     } catch (error) {
-//       throw new NotFoundException(
-//         "Address not found!",
-//         ErrorCode.ADDRESS_NOT_FOUND
-//       );
-//     }
-
-//     if (shippingAddress.userId !== req.body.user.id) {
-//       throw new NotFoundException(
-//         "Address does not belong to user",
-//         ErrorCode.ADDRESS_DOES_NOT_BELONG
-//       );
-//     }
-//   }
-
-//   if (validatedData.defaultBillingAddress) {
-//     try {
-//       billingAddress = await prismaClient.address.findFirstOrThrow({
-//         where: { id: validatedData.defaultBillingAddress },
-//       });
-//     } catch (error) {
-//       throw new NotFoundException(
-//         "Address not found!",
-//         ErrorCode.ADDRESS_NOT_FOUND
-//       );
-//     }
-//     if (billingAddress.userId !== req.body.user.id) {
-//       throw new NotFoundException(
-//         "Address does not belong to user",
-//         ErrorCode.ADDRESS_DOES_NOT_BELONG
-//       );
-//     }
-//   }
-
-//   const updatedUser = await prismaClient.user.update({
-//     where: { id: req.body.user.id },
-//     data: validatedData,
-//   });
-
-//   res.send(updatedUser);
-// };
+export const changeQuantity = async (req: Request, res: Response) => {
+  const validatedData = ChangeQuantitySchema.shape.body.parse(req.body);
+  const updatedCart = await prismaClient.cartItem.update({
+    where: { id: Number(req.params.id) },
+    data: { quantity: validatedData.quantity },
+  });
+  res.send(updatedCart);
+};

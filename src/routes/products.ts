@@ -34,7 +34,7 @@ productRegistry.registerPath({
     query: GetProductsSchema.shape.query,
   },
   responses: {
-    201: {
+    200: {
       description: "Products retrieved successfully",
       content: {
         "application/json": {
@@ -65,7 +65,7 @@ productRegistry.registerPath({
     params: ProductByIdSchema.shape.params,
   },
   responses: {
-    201: {
+    200: {
       description: "Product retrieved successfully",
       content: {
         "application/json": {

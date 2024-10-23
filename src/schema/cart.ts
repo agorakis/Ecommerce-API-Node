@@ -31,3 +31,8 @@ export const GetCartSchema = z.object({
   updatedAt: z.string(),
   product: ProductSchema,
 });
+
+export const ChangeQuantitySchema = z.object({
+  body: z.object({ quantity: z.number() }),
+  params: z.object({ id: z.number() }),
+});
