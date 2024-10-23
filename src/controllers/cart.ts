@@ -5,13 +5,14 @@ import { ErrorCode } from "../exceptions/root";
 import { AddCartSchema } from "../schema/cart";
 import { Product } from "@prisma/client";
 
-// export const getUserAddresses = async (req: Request, res: Response) => {
-//   const userAddresses = await prismaClient.address.findMany({
-//     where: { userId: req.body.user.id },
-//   });
+export const getUserCart = async (req: Request, res: Response) => {
+  const userCart = await prismaClient.cartItem.findMany({
+    where: { userId: req.body.user.id },
+    include: { product: true },
+  });
 
-//   res.send({ userAddresses });
-// };
+  res.send({ userCart });
+};
 
 export const deleteCartItem = async (req: Request, res: Response) => {
   const cartItem = await prismaClient.cartItem.findUnique({

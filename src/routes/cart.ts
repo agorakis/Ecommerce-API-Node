@@ -2,40 +2,49 @@ import { Router } from "express";
 import { errorHandler } from "../error-handler";
 import { OpenAPIRegistry } from "@asteasolutions/zod-to-openapi";
 import { authMiddleware } from "../middlewares/auth";
-import { addItemToCart, deleteCartItem } from "../controllers/cart";
+import {
+  addItemToCart,
+  deleteCartItem,
+  getUserCart,
+} from "../controllers/cart";
 import { AuthHeadersSchema } from "../schema/users";
-import { AddCartSchema, CartByIdSchema, CartItemSchema } from "../schema/cart";
+import {
+  AddCartSchema,
+  CartByIdSchema,
+  CartItemSchema,
+  GetCartSchema,
+} from "../schema/cart";
 
 export const cartRegistry = new OpenAPIRegistry();
 cartRegistry.register("Cart", CartItemSchema);
 
 const cartRouter: Router = Router();
 
-// userRegistry.registerPath({
-//   method: "get",
-//   path: "/users/address",
-//   tags: ["Users"],
-//   description: "This endpoint returns all the addresses of the logged in user",
-//   summary: "Get all addresses of user",
-//   request: {
-//     headers: AuthHeadersSchema,
-//   },
-//   responses: {
-//     201: {
-//       description: "Addresses retrieved successfully",
-//       content: {
-//         "application/json": {
-//           schema: GetAddressesSchema,
-//         },
-//       },
-//     },
-//     401: {
-//       description: "Unauthorized, invalid or missing token",
-//     },
-//   },
-// });
+cartRegistry.registerPath({
+  method: "get",
+  path: "/cart",
+  tags: ["Cart"],
+  description: "This endpoint returns cart items of the logged in user",
+  summary: "Get cart items of user",
+  request: {
+    headers: AuthHeadersSchema,
+  },
+  responses: {
+    200: {
+      description: "Cart items retrieved successfully",
+      content: {
+        "application/json": {
+          schema: GetCartSchema,
+        },
+      },
+    },
+    401: {
+      description: "Unauthorized, invalid or missing token",
+    },
+  },
+});
 
-// usersRouter.get("/address", [authMiddleware], errorHandler(getUserAddresses));
+cartRouter.get("/", [authMiddleware], errorHandler(getUserCart));
 
 cartRegistry.registerPath({
   method: "delete",
