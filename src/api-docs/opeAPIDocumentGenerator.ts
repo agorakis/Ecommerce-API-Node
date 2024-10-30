@@ -6,6 +6,7 @@ import { authRegistry } from "../routes/auth";
 import { productRegistry } from "../routes/products";
 import { userRegistry } from "../routes/users";
 import { cartRegistry } from "../routes/cart";
+import { orderRegistry } from "../routes/orders";
 
 export const generateOpenAPIDocument = () => {
   const registry = new OpenAPIRegistry([
@@ -13,6 +14,7 @@ export const generateOpenAPIDocument = () => {
     productRegistry,
     userRegistry,
     cartRegistry,
+    orderRegistry,
   ]);
 
   const generator = new OpenApiGeneratorV3(registry.definitions);
