@@ -110,6 +110,16 @@ export const getUsers = async (req: Request, res: Response) => {
   res.send({ count: count, users: allUsers });
 };
 
-export const getUserById = async (req: Request, res: Response) => {};
+export const getUserById = async (req: Request, res: Response) => {
+  try {
+    const user = await prismaClient.user.findFirstOrThrow({
+      where: { id: Number(req.params.id) },
+      include: { addresses: true },
+    });
+    res.send(user);
+  } catch (error) {
+    throw new NotFoundException("User not found!", ErrorCode.USER_NOT_FOUND);
+  }
+};
 
 export const updateUserRole = async (req: Request, res: Response) => {};

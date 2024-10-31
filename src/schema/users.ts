@@ -15,14 +15,6 @@ export const UserSchema = z.object({
   defaultBillingAddress: z.number().optional(),
 });
 
-export const GetUsersSchema = z.object({
-  query: z.object({ skip: z.number(), take: z.number() }),
-  response: z.object({
-    count: z.number(),
-    users: z.array(UserSchema),
-  }),
-});
-
 export const UpdateUserSchema = z.object({
   name: z.string().optional(),
   defaultShippingAddress: z.number().optional(),
@@ -64,10 +56,24 @@ export const AddressSchema = z.object({
   country: z.string(),
   city: z.string(),
   userId: z.number(),
+  formattedAddress: z.string().optional(),
 });
 
 export const GetAddressesSchema = z.array(AddressSchema);
 
 export const AddressByIdSchema = z.object({
   params: z.object({ id: z.number() }),
+});
+
+export const GetUsersSchema = z.object({
+  query: z.object({ skip: z.number(), take: z.number() }),
+  response: z.object({
+    count: z.number(),
+    users: z.array(UserSchema),
+  }),
+});
+
+export const UserByIdSchema = z.object({
+  params: z.object({ id: z.number() }),
+  response: z.object({ user: UserSchema, addresses: z.array(AddressSchema) }),
 });

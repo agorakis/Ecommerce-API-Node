@@ -9,6 +9,7 @@ import {
   GetAddressesSchema,
   GetUsersSchema,
   UpdateUserSchema,
+  UserByIdSchema,
   UserSchema,
 } from "../schema/users";
 import {
@@ -184,6 +185,34 @@ userRegistry.registerPath({
 });
 
 usersRouter.get("/", [authMiddleware, adminMiddleware], errorHandler(getUsers));
+
+userRegistry.registerPath({
+  method: "get",
+  path: "/users/{id}",
+  tags: ["Users"],
+  description: "This endpoint returns specific user by id to the admin user",
+  summary: "Get user by id",
+  request: {
+    headers: AuthHeadersSchema,
+    params: UserByIdSchema.shape.params,
+  },
+  responses: {
+    200: {
+      description: "User retrieved successfully",
+      content: {
+        "application/json": {
+          schema: UserByIdSchema.shape.response,
+        },
+      },
+    },
+    401: {
+      description: "Unauthorized, invalid or missing token",
+    },
+    404: {
+      description: "User not found",
+    },
+  },
+});
 
 usersRouter.get(
   "/:id",
