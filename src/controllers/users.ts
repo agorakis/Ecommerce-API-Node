@@ -98,3 +98,18 @@ export const updateUser = async (req: Request, res: Response) => {
 
   res.send(updatedUser);
 };
+
+export const getUsers = async (req: Request, res: Response) => {
+  const count = await prismaClient.user.count();
+
+  const allUsers = await prismaClient.user.findMany({
+    skip: Number(req.query.skip) || 0,
+    take: Number(req.query.take) || 5,
+  });
+
+  res.send({ count: count, users: allUsers });
+};
+
+export const getUserById = async (req: Request, res: Response) => {};
+
+export const updateUserRole = async (req: Request, res: Response) => {};

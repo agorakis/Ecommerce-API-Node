@@ -15,6 +15,14 @@ export const UserSchema = z.object({
   defaultBillingAddress: z.number().optional(),
 });
 
+export const GetUsersSchema = z.object({
+  query: z.object({ skip: z.number(), take: z.number() }),
+  response: z.object({
+    count: z.number(),
+    users: z.array(UserSchema),
+  }),
+});
+
 export const UpdateUserSchema = z.object({
   name: z.string().optional(),
   defaultShippingAddress: z.number().optional(),

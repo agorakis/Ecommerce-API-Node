@@ -7,6 +7,7 @@ import {
   AddressSchema,
   AuthHeadersSchema,
   GetAddressesSchema,
+  GetUsersSchema,
   UpdateUserSchema,
   UserSchema,
 } from "../schema/users";
@@ -14,8 +15,12 @@ import {
   createAddress,
   deleteAddress,
   getUserAddresses,
+  getUserById,
+  getUsers,
   updateUser,
+  updateUserRole,
 } from "../controllers/users";
+import { adminMiddleware } from "../middlewares/admin";
 
 export const userRegistry = new OpenAPIRegistry();
 userRegistry.register("User", UserSchema);
@@ -150,5 +155,46 @@ userRegistry.registerPath({
 });
 
 usersRouter.put("/", [authMiddleware], errorHandler(updateUser));
+
+//////////
+
+userRegistry.registerPath({
+  method: "get",
+  path: "/users",
+  tags: ["Users"],
+  description: "This endpoint returns all the users to the admin user",
+  summary: "Get all users",
+  request: {
+    headers: AuthHeadersSchema,
+    query: GetUsersSchema.shape.query,
+  },
+  responses: {
+    200: {
+      description: "Users retrieved successfully",
+      content: {
+        "application/json": {
+          schema: GetUsersSchema.shape.response,
+        },
+      },
+    },
+    401: {
+      description: "Unauthorized, invalid or missing token",
+    },
+  },
+});
+
+usersRouter.get("/", [authMiddleware, adminMiddleware], errorHandler(getUsers));
+
+usersRouter.get(
+  "/:id",
+  [authMiddleware, adminMiddleware],
+  errorHandler(getUserById)
+);
+
+usersRouter.put(
+  "/role",
+  [authMiddleware, adminMiddleware],
+  errorHandler(updateUserRole)
+);
 
 export default usersRouter;
