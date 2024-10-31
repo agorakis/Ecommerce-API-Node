@@ -2,6 +2,7 @@ import { Request, Response } from "express";
 import { prismaClient } from "..";
 import { NotFoundException } from "../exceptions/not-found";
 import { ErrorCode } from "../exceptions/root";
+import { UnauthorizedException } from "../exceptions/unauthorized";
 
 export const getOrders = async (req: Request, res: Response) => {
   const orders = await prismaClient.order.findMany({
@@ -26,16 +27,37 @@ export const getOrderById = async (req: Request, res: Response) => {
 
 export const cancelOrder = async (req: Request, res: Response) => {
   try {
-    const order = await prismaClient.order.update({
-      where: { id: Number(req.params.id) },
-      data: { status: "CANCELLED" },
-    });
+    const result = await prismaClient.$transaction(async (tx) => {
+      const order = await tx.order.findUnique({
+        where: { id: Number(req.params.id) },
+      });
 
-    await prismaClient.orderEvent.create({
-      data: { orderId: order.id, status: "CANCELLED" },
-    });
+      if (!order) {
+        throw new NotFoundException(
+          "Order not found",
+          ErrorCode.ORDER_NOT_FOUND
+        );
+      }
 
-    res.send(order);
+      if (order.userId !== req.body.user.id) {
+        throw new UnauthorizedException(
+          "You cannot cancel this order",
+          ErrorCode.UNAUTHORIZED_EXCEPTION
+        );
+      }
+
+      const updatedOrder = await tx.order.update({
+        where: { id: order.id },
+        data: { status: "CANCELLED" },
+      });
+
+      await tx.orderEvent.create({
+        data: { orderId: updatedOrder.id, status: "CANCELLED" },
+      });
+
+      return updatedOrder;
+    });
+    res.send(result);
   } catch (error) {
     throw new NotFoundException("Order not found", ErrorCode.ORDER_NOT_FOUND);
   }
