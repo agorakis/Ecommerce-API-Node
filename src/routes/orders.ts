@@ -69,7 +69,7 @@ orderRegistry.registerPath({
       description: "Unauthorized, invalid or missing token",
     },
     404: {
-      description: "Product not found",
+      description: "Order not found",
     },
   },
 });
@@ -99,7 +99,7 @@ orderRegistry.registerPath({
       description: "Unauthorized, invalid or missing token",
     },
     404: {
-      description: "Product not found",
+      description: "Order not found",
     },
   },
 });

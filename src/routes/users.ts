@@ -73,7 +73,7 @@ userRegistry.registerPath({
       description: "Unauthorized, invalid or missing token",
     },
     404: {
-      description: "Product not found",
+      description: "Address not found",
     },
   },
 });
