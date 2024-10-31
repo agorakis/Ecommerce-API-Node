@@ -22,7 +22,7 @@ export const prismaClient = new PrismaClient({ log: ["query"] }).$extends({
           pincode: true,
         },
         compute: (addr) => {
-          return `${addr.lineOne}, ${addr.lineTwo}, ${addr.city}, ${addr.country}-${addr.pincode}`;
+          return `${addr.lineOne}, ${addr.lineTwo}, ${addr.city}, ${addr.country} - ${addr.pincode}`;
         },
       },
     },

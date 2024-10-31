@@ -8,6 +8,7 @@ import {
   AuthHeadersSchema,
   GetAddressesSchema,
   GetUsersSchema,
+  UpdateUserRoleSchema,
   UpdateUserSchema,
   UserByIdSchema,
   UserSchema,
@@ -157,8 +158,6 @@ userRegistry.registerPath({
 
 usersRouter.put("/", [authMiddleware], errorHandler(updateUser));
 
-//////////
-
 userRegistry.registerPath({
   method: "get",
   path: "/users",
@@ -220,8 +219,41 @@ usersRouter.get(
   errorHandler(getUserById)
 );
 
+userRegistry.registerPath({
+  method: "put",
+  path: "/users/:id/role",
+  tags: ["Users"],
+  description: "This endpoint updates user's role by admin",
+  summary: "Updates user role",
+  request: {
+    headers: AuthHeadersSchema,
+    params: UpdateUserRoleSchema.shape.params,
+    body: {
+      content: {
+        "application/json": { schema: UpdateUserRoleSchema.shape.body },
+      },
+    },
+  },
+  responses: {
+    200: {
+      description: "User role updated successfully",
+      content: {
+        "application/json": {
+          schema: UserSchema,
+        },
+      },
+    },
+    401: {
+      description: "Unauthorized, invalid or missing token",
+    },
+    404: {
+      description: "User not found",
+    },
+  },
+});
+
 usersRouter.put(
-  "/role",
+  "/:id/role",
   [authMiddleware, adminMiddleware],
   errorHandler(updateUserRole)
 );

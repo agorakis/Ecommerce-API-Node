@@ -2,7 +2,11 @@ import { Request, Response } from "express";
 import { prismaClient } from "..";
 import { NotFoundException } from "../exceptions/not-found";
 import { ErrorCode } from "../exceptions/root";
-import { AddressSchema, UpdateUserSchema } from "../schema/users";
+import {
+  AddressSchema,
+  UpdateUserRoleSchema,
+  UpdateUserSchema,
+} from "../schema/users";
 import { Address } from "@prisma/client";
 
 export const getUserAddresses = async (req: Request, res: Response) => {
@@ -122,4 +126,16 @@ export const getUserById = async (req: Request, res: Response) => {
   }
 };
 
-export const updateUserRole = async (req: Request, res: Response) => {};
+export const updateUserRole = async (req: Request, res: Response) => {
+  UpdateUserRoleSchema.shape.body.parse(req.body);
+
+  try {
+    const user = await prismaClient.user.update({
+      where: { id: Number(req.params.id) },
+      data: { role: req.body.role },
+    });
+    res.send(user);
+  } catch (error) {
+    throw new NotFoundException("User not found!", ErrorCode.USER_NOT_FOUND);
+  }
+};

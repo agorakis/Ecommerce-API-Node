@@ -77,3 +77,8 @@ export const UserByIdSchema = z.object({
   params: z.object({ id: z.number() }),
   response: z.object({ user: UserSchema, addresses: z.array(AddressSchema) }),
 });
+
+export const UpdateUserRoleSchema = z.object({
+  params: z.object({ id: z.number() }),
+  body: z.object({ role: z.enum(["ADMIN", "USER"]) }),
+});
