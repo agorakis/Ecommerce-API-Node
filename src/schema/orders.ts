@@ -4,6 +4,14 @@ import { ProductSchema } from "./products";
 
 extendZodWithOpenApi(z);
 
+const StatusEnum = z.enum([
+  "PENDING",
+  "ACCEPTED",
+  "OUT_FOR_DELIVERY",
+  "DELIVERED",
+  "CANCELLED",
+]);
+
 export const OrderSchema = z.object({
   id: z.number(),
   userId: z.number(),
@@ -16,13 +24,7 @@ export const OrderSchema = z.object({
 export const EventSchema = z.object({
   id: z.number(),
   orderId: z.number(),
-  status: z.enum([
-    "PENDING",
-    "ACCEPTED",
-    "OUT_FOR_DELIVERY",
-    "DELIVERED",
-    "CANCELLED",
-  ]),
+  status: StatusEnum,
   createdAt: z.string(),
   updatedAt: z.string(),
 });
@@ -35,5 +37,36 @@ export const OrderByIdSchema = z.object({
     OrderSchema,
     products: z.array(ProductSchema),
     events: z.array(EventSchema),
+  }),
+});
+
+export const GetAllOrdersSchema = z.object({
+  query: z.object({
+    skip: z.number(),
+    take: z.number(),
+    status: StatusEnum.optional(),
+  }),
+  response: z.object({
+    OrderSchema,
+  }),
+});
+
+export const GetUserOrdersSchema = z.object({
+  params: z.object({ id: z.number() }),
+  query: z.object({
+    status: StatusEnum.optional(),
+  }),
+  response: z.object({
+    OrderSchema,
+  }),
+});
+
+export const UpdateOrderStatusSchema = z.object({
+  params: z.object({ id: z.number() }),
+  body: z.object({
+    status: StatusEnum,
+  }),
+  response: z.object({
+    OrderSchema,
   }),
 });

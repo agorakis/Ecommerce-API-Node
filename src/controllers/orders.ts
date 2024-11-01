@@ -3,6 +3,7 @@ import { prismaClient } from "..";
 import { NotFoundException } from "../exceptions/not-found";
 import { ErrorCode } from "../exceptions/root";
 import { UnauthorizedException } from "../exceptions/unauthorized";
+import { UpdateOrderStatusSchema } from "../schema/orders";
 
 export const getOrders = async (req: Request, res: Response) => {
   const orders = await prismaClient.order.findMany({
@@ -106,4 +107,65 @@ export const createOrder = async (req: Request, res: Response) => {
 
     return res.send(order);
   });
+};
+
+export const getAllOrders = async (req: Request, res: Response) => {
+  let whereClause = {};
+
+  const status = req.query.status;
+  if (status) {
+    whereClause = { status };
+  }
+
+  const orders = await prismaClient.order.findMany({
+    where: whereClause,
+    skip: Number(req.query.skip) || 0,
+    take: Number(req.query.take) || 5,
+  });
+
+  res.send(orders);
+};
+
+export const getUserOrders = async (req: Request, res: Response) => {
+  let whereClause: any = {
+    userId: Number(req.params.id),
+  };
+
+  const status = req.query.status;
+  if (status) {
+    whereClause = { ...whereClause, status };
+  }
+
+  const orders = await prismaClient.order.findMany({
+    where: whereClause,
+    skip: Number(req.query.skip) || 0,
+    take: Number(req.query.take) || 5,
+  });
+
+  res.send(orders);
+};
+
+export const updateOrderStatus = async (req: Request, res: Response) => {
+  UpdateOrderStatusSchema.shape.body.parse(req.body);
+
+  try {
+    const result = await prismaClient.$transaction(async (tx) => {
+      const order = await tx.order.update({
+        where: { id: Number(req.params.id) },
+        data: { status: req.body.status },
+      });
+
+      await tx.orderEvent.create({
+        data: {
+          orderId: order.id,
+          status: req.body.status,
+        },
+      });
+
+      return order;
+    });
+    res.send(result);
+  } catch (error) {
+    throw new NotFoundException("Order not found", ErrorCode.ORDER_NOT_FOUND);
+  }
 };
