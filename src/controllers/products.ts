@@ -4,6 +4,17 @@ import { UpdateCreateProductSchema } from "../schema/products";
 import { NotFoundException } from "../exceptions/not-found";
 import { ErrorCode } from "../exceptions/root";
 
+export const searchProducts = async (req: Request, res: Response) => {
+  const products = await prismaClient.product.findMany({
+    where: {
+      name: { search: req.query.q?.toString() },
+      description: { search: req.query.q?.toString() },
+    },
+  });
+
+  res.send(products);
+};
+
 export const getProducts = async (req: Request, res: Response) => {
   const count = await prismaClient.product.count();
   const allProducts = await prismaClient.product.findMany({

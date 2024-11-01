@@ -13,6 +13,11 @@ export const ProductSchema = z.object({
   updatedAt: z.string(),
 });
 
+export const SearchProductsSchema = z.object({
+  query: z.object({ q: z.string() }),
+  response: z.array(ProductSchema),
+});
+
 export const GetProductsSchema = z.object({
   query: z.object({ skip: z.number(), take: z.number() }),
   response: z.object({

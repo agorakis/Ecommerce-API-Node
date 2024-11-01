@@ -6,12 +6,14 @@ import {
   ProductByIdSchema,
   GetProductsSchema,
   ProductSchema,
+  SearchProductsSchema,
 } from "../schema/products";
 import {
   createProduct,
   deleteProduct,
   getProductById,
   getProducts,
+  searchProducts,
   updateProduct,
 } from "../controllers/products";
 import { authMiddleware } from "../middlewares/auth";
@@ -22,6 +24,32 @@ export const productRegistry = new OpenAPIRegistry();
 productRegistry.register("Product", ProductSchema);
 
 const productsRouter: Router = Router();
+
+productRegistry.registerPath({
+  method: "get",
+  path: "/products/search",
+  tags: ["Products"],
+  description: "This endpoint search products for login user",
+  summary: "Search products",
+  request: {
+    headers: AuthHeadersSchema,
+    query: SearchProductsSchema.shape.query,
+  },
+  responses: {
+    200: {
+      description: "Search products retrieved successfully",
+      content: {
+        "application/json": {
+          schema: SearchProductsSchema.shape.response,
+        },
+      },
+    },
+    401: {
+      description: "Unauthorized, invalid or missing token",
+    },
+  },
+});
+productsRouter.get("/search", [authMiddleware], errorHandler(searchProducts));
 
 productRegistry.registerPath({
   method: "get",
@@ -44,6 +72,9 @@ productRegistry.registerPath({
     },
     401: {
       description: "Unauthorized, invalid or missing token",
+    },
+    404: {
+      description: "Product not found",
     },
   },
 });
